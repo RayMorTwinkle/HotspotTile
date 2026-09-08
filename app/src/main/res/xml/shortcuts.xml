@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 桌面长按图标弹出的菜单项 -->
+    <shortcut
+        android:shortcutId="open_settings"
+        android:enabled="true"
+        android:icon="@drawable/ic_short_settings"
+        android:shortcutShortLabel="@string/shortcut_settings"
+        android:shortcutLongLabel="@string/shortcut_settings_long">
+        <intent
+            android:action="com.ray.hotspot.action.OPEN_SETTINGS"
+            android:targetPackage="com.ray.hotspot"
+            android:targetClass="com.ray.hotspot.SettingsActivity" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="open_page"
+        android:enabled="true"
+        android:icon="@drawable/ic_short_page"
+        android:shortcutShortLabel="@string/shortcut_page"
+        android:shortcutLongLabel="@string/shortcut_page">
+        <intent
+            android:action="com.ray.hotspot.action.OPEN_PAGE"
+            android:targetPackage="com.ray.hotspot"
+            android:targetClass="com.ray.hotspot.MainActivity">
+            <extra
+                android:name="mode"
+                android:value="page" />
+        </intent>
+    </shortcut>
+</shortcuts>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WiFi热点</string>
+    <string name="tile_name">WiFi热点</string>
+    <string name="shortcut_settings">热点设置</string>
+    <string name="shortcut_settings_long">热点设置（名称/密码/行为）</string>
+    <string name="shortcut_page">打开热点页</string>
+</resources>

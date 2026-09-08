@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 热点：底部圆点 + 两道弧线（纯白，透明底，符合磁贴图标规范） -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,16.5 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M8.46,12.96 A5,5 0 0,1 15.54,12.96" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M5.64,10.14 A9,9 0 0,1 18.36,10.14" />
+</vector>
