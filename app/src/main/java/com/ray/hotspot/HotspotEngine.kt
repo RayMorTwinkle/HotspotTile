@@ -140,14 +140,17 @@ object HotspotEngine {
         main.post { cb(ok, msg) }
     }
 
-    /** 轮询验证状态是否翻转；状态完全读不到时按失败处理（宁可信其无）。 */
+    /** 轮询验证状态是否翻转；需连续两次读到目标状态（间隔 600ms，约 1.2 秒）才算稳定，
+     *  避免系统短暂上报目标状态后又回滚被误判为成功；状态完全读不到时按失败处理（宁可信其无）。 */
     private fun awaitState(target: Boolean, timeoutMs: Long = 6000): Boolean {
         val deadline = System.currentTimeMillis() + timeoutMs
+        var hits = 0
         while (System.currentTimeMillis() < deadline) {
             Thread.sleep(600)
-            if (state() == target) return true
+            hits = if (state() == target) hits + 1 else 0
+            if (hits >= 2) return true
         }
-        return state() == target
+        return false
     }
 
     /**
