@@ -53,15 +53,15 @@ class MainActivity : Activity() {
     /** Android 13+ 弹一次「添加到控制中心」系统对话框。 */
     private fun requestAddTileOnce() {
         if (Build.VERSION.SDK_INT < 33 || Prefs.tilePrompted) return
-        Prefs.tilePrompted = true
         try {
-            val smb = getSystemService(StatusBarManager::class.java)
-            smb?.requestAddTileService(
+            val smb = getSystemService(StatusBarManager::class.java) ?: return
+            smb.requestAddTileService(
                 ComponentName(this, HotspotTileService::class.java),
                 getString(R.string.tile_name),
                 Icon.createWithResource(this, R.drawable.ic_hotspot),
                 mainExecutor
             ) { }
+            Prefs.tilePrompted = true
         } catch (t: Throwable) {
             Log.w(TAG, "requestAddTileService failed: $t")
         }
