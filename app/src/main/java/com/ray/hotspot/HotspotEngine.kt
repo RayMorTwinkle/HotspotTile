@@ -323,15 +323,31 @@ object HotspotEngine {
     private fun readSystemApConfig(): ApCreds? {
         for (p in SYS_AP_PATHS) {
             val xml = RootShell.exec("cat $p", timeoutMs = 8000).out
-            val el = Regex("<SoftAp\\b[^>]*>").find(xml)?.value ?: continue
-            val ssid = attr(el, "SSID")?.removeSurrounding("\"")
-                ?.takeIf { it.isNotEmpty() } ?: continue
-            val pass = attr(el, "Passphrase")?.removeSurrounding("\"")
-                ?.takeIf { it.isNotEmpty() }
-            return ApCreds(ssid, pass, open = pass == null)
+            // AOSP WifiConfigStore 子元素格式（Android 11+ 实测）：
+            //   <SoftAp><string name="WifiSsid">&quot;ssid&quot;</string>
+            //           <int name="SecurityType" value="1" />
+            //           <string name="Passphrase">pass</string>…</SoftAp>
+            val tag = Regex("<SoftAp\\b[^>]*>").find(xml)?.value ?: continue
+            val body = Regex("<SoftAp\\b[^>]*>([\\s\\S]*?)</SoftAp>").find(xml)
+                ?.groupValues?.get(1) ?: continue
+            val ssid = (
+                strElem(body, "WifiSsid") ?: attr(tag, "SSID")
+            )?.removeSurrounding("\"")?.takeIf { it.isNotEmpty() } ?: continue
+            val pass = (
+                strElem(body, "Passphrase") ?: attr(tag, "Passphrase")
+            )?.removeSurrounding("\"")?.takeIf { it.isNotEmpty() }
+            // SecurityType：0=open；加密配置却读不到密码 = 凭据不全，不可当开放用
+            val security = Regex("<int name=\"SecurityType\" value=\"(\\d+)\"")
+                .find(body)?.groupValues?.get(1)?.toIntOrNull()
+            if (security != null && security != 0 && pass == null) continue
+            return ApCreds(ssid, pass, open = security == 0 || (security == null && pass == null))
         }
         return null
     }
+
+    private fun strElem(body: String, name: String): String? =
+        Regex("<string name=\"$name\">(.*?)</string>").find(body)
+            ?.groupValues?.get(1)?.let(::unescapeXml)
 
     private fun attr(el: String, name: String): String? =
         Regex("$name=\"([^\"]*)\"").find(el)?.groupValues?.get(1)?.let(::unescapeXml)
