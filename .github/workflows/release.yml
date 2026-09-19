@@ -4,8 +4,9 @@
 #   2) release agent（issue-triage-bot release.py）经 `gh workflow run Release` 无参触发——
 #      因此 version 输入必须保持可选（required: false），这是与 agent 的硬契约，勿改回必填。
 # 版本号：输入优先（形如 v1.0.0，可带 -beta1 等后缀）；留空则自动取上一 v* tag 的 patch+1（首个为 v0.1.0）。
-# 说明：本仓库没有签名配置（签名构建在 Roadmap 中），发布物为 app-debug.apk，
-#       与 README「到 Releases 下载 app-debug.apk」的指引保持一致。
+# 签名：keystore 不入库，经 GitHub Secrets（RELEASE_KEYSTORE/KEYSTORE_PASSWORD/
+#       KEY_ALIAS/KEY_PASSWORD）在构建时还原为 release 签名；产物为
+#       HotspotTile-<version>.apk（assembleRelease，debuggable=false，可覆盖升级）。
 name: Release
 
 on:
@@ -75,18 +76,37 @@ jobs:
       - name: 预接受 Android SDK 许可（compileSdk 36 平台由 AGP 按需下载）
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
 
-      - name: 构建 APK（./gradlew assembleDebug，与 README「从源码构建」一致）
+      - name: 从 Secrets 还原 release keystore
+        env:
+          RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
+        run: echo "$RELEASE_KEYSTORE" | base64 -d > "$RUNNER_TEMP/release.jks"
+
+      - name: 构建 release APK（签名 + 注入版本号）
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          VN="${VERSION#v}"
+          CORE="${VN%%-*}"
+          VC=$(echo "$CORE" | awk -F. '{print $1*10000+$2*100+$3}')
+          echo "versionName=$VN versionCode=$VC"
+          ./gradlew assembleRelease -PversionName="$VN" -PversionCode="$VC" --stacktrace
 
-      - name: 校验产物并生成 SHA-256
+      - name: 校验产物、改名并生成 SHA-256
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
-          APK="app/build/outputs/apk/debug/app-debug.apk"
-          if [[ ! -s "$APK" ]]; then
-            echo "::error::未找到构建产物：$APK"
+          SRC="app/build/outputs/apk/release/app-release.apk"
+          APK="app/build/outputs/apk/release/HotspotTile-${VERSION#v}.apk"
+          if [[ ! -s "$SRC" ]]; then
+            echo "::error::未找到构建产物：$SRC"
             exit 1
           fi
+          mv "$SRC" "$APK"
           sha256sum "$APK" > "$APK.sha256"
           echo "APK 大小：$(du -h "$APK" | cut -f1)"
 
@@ -101,5 +121,5 @@ jobs:
           prerelease: ${{ contains(steps.ver.outputs.version, '-') }}
           fail_on_unmatched_files: true
           files: |
-            app/build/outputs/apk/debug/app-debug.apk
-            app/build/outputs/apk/debug/app-debug.apk.sha256
+            app/build/outputs/apk/release/HotspotTile-*.apk
+            app/build/outputs/apk/release/HotspotTile-*.apk.sha256

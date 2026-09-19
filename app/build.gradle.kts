@@ -14,8 +14,31 @@ android {
         // 升高会失去 WifiManager.getWifiApState 等反射可用性；(b) 避开
         // Android 15 强制 edge-to-edge 对 Theme.DeviceDefault.Settings 的破坏
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        // CI 经 -PversionName/-PversionCode 注入 tag 对应版本；本地构建用默认值
+        versionCode = providers.gradleProperty("versionCode").orNull?.toInt() ?: 1
+        versionName = providers.gradleProperty("versionName").orNull ?: "1.0.0"
+    }
+
+    signingConfigs {
+        create("release") {
+            // keystore 不入库：CI 从 GitHub Secrets 还原到临时路径后经环境变量传入
+            val store = System.getenv("KEYSTORE_FILE")
+            if (!store.isNullOrBlank()) {
+                storeFile = file(store)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // 无 keystore 环境时保持未签名——此类 APK 不可安装，仅 CI（有 secrets）产出正式包
+            if (!System.getenv("KEYSTORE_FILE").isNullOrBlank()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
     }
 
     compileOptions {

@@ -95,13 +95,13 @@ flowchart TD
 
 ### 方式一：下载 APK（推荐）
 
-到 [**Releases**](https://github.com/RayMorTwinkle/HotspotTile/releases) 下载 `app-debug.apk`，直接安装。
+到 [**Releases**](https://github.com/RayMorTwinkle/HotspotTile/releases) 下载 `HotspotTile-x.y.z.apk`（正式 release 签名构建），直接安装。
 
 <details>
 <summary>🛠️ 用 adb 安装</summary>
 
 ```bash
-adb install -r app-debug.apk
+adb install -r HotspotTile-*.apk
 ```
 
 </details>
@@ -216,7 +216,7 @@ cd HotspotTile
 - [ ] 更多 OEM 热点页面深链适配（MIUI / HyperOS / ColorOS / HarmonyOS 情况收集）
 - [ ] 英文 README
 - [ ] 热点配置二维码分享
-- [ ] Release 签名构建
+- [x] Release 签名构建（v1.0.4 起，keystore 经 GitHub Secrets 注入 CI）
 
 ## 🙏 致谢与参考
 
