@@ -34,7 +34,9 @@ class HotspotTileService : TileService() {
                 refresh()
             }
             else -> { // "toggle"
-                setBusy()
+                // 乐观刷新：按当前磁贴状态立即呈现目标态，不等引擎结果；
+                // 失败由 toggle 完成后的 refresh() 按真实状态回滚
+                setOptimistic(qsTile?.state != Tile.STATE_ACTIVE)
                 HotspotEngine.toggle { r ->
                     toast(r.msg)
                     when (r.fallback.takeIf { !r.ok }) {
@@ -47,9 +49,12 @@ class HotspotTileService : TileService() {
         }
     }
 
-    private fun setBusy() {
+    private fun setOptimistic(on: Boolean) {
         qsTile?.let {
-            it.state = Tile.STATE_UNAVAILABLE
+            it.state = if (on) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+            if (Build.VERSION.SDK_INT >= 29) {
+                it.subtitle = if (on) "热点已开" else "热点已关"
+            }
             it.updateTile()
         }
     }
@@ -66,8 +71,8 @@ class HotspotTileService : TileService() {
                     t.subtitle = when {
                         s == null && !rooted -> "点击打开热点页"
                         s == null -> "状态未知 · 点击切换"
-                        rooted -> "Root/直控 · 长按设置"
-                        else -> "直控 · 长按设置"
+                        s == true -> "热点已开"
+                        else -> "热点已关"
                     }
                 }
                 t.updateTile()

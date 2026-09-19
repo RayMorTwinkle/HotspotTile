@@ -421,6 +421,18 @@ object HotspotEngine {
         sb.appendLine("反射直控（真共享）：$reflect")
         if (root) {
             val creds = apCreds()
+            // 系统热点配置单独列出展示（密码只显示位数）；
+            // 进阶模式下 creds 是自定义值，需另读一次系统 XML
+            val sys = if (Prefs.customApConfig) readSystemApConfig() else creds
+            if (sys != null) {
+                sb.appendLine("系统热点名称：${sys.ssid}")
+                sb.appendLine(
+                    "系统热点密码：" + (
+                        sys.pass?.let { "${it.length}位（${"*".repeat(it.length)}）" }
+                            ?: "无（开放网络）"
+                        )
+                )
+            }
             if (creds != null) {
                 val src = if (Prefs.customApConfig) "自定义（进阶）" else "系统配置"
                 // 密码打码后再进命令文本，诊断页不出现明文密码
