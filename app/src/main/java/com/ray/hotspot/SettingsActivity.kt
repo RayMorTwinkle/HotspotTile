@@ -63,6 +63,8 @@ class SettingsActivity : Activity() {
         val btnOn = findViewById<Button>(R.id.btn_test_on)
         val btnOff = findViewById<Button>(R.id.btn_test_off)
         val btnRecheckRoot = findViewById<Button>(R.id.btn_recheck_root)
+        findViewById<TextView>(R.id.tv_version).text =
+            "v${packageManager.getPackageInfo(packageName, 0).versionName}"
 
         // ---- 载入 ----
         cbCustomAp.isChecked = Prefs.customApConfig

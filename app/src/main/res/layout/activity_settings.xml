@@ -10,226 +10,287 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="诊断"
-            android:textStyle="bold"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/diag"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:textSize="12sp"
-            android:paddingTop="6dp"
-            android:text="正在检测…" />
-
+        <!-- 页头：品牌图标 + 名称 + 简介 + 版本号 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="6dp">
+            android:gravity="center_vertical"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:layout_marginBottom="16dp">
 
-            <Button
-                android:id="@+id/btn_test_on"
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_brand_circle">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_hotspot"
+                    android:contentDescription="@null" />
+            </FrameLayout>
+
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="测试开启" />
+                android:orientation="vertical"
+                android:paddingStart="14dp">
 
-            <Button
-                android:id="@+id/btn_test_off"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="测试关闭" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="WiFi热点"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
 
-            <Button
-                android:id="@+id/btn_recheck_root"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="恢复被系统隐藏的热点直控"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_version"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="重新检测Root" />
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:text="热点名称 / 密码（进阶）"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+        <!-- 诊断 + 测试操作 -->
+        <LinearLayout style="@style/Card">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:text="默认使用系统里已配置的热点名称/密码（Root 直启时自动读取系统配置）。只有想覆盖系统设置时才需要开启进阶填写。" />
+            <TextView
+                style="@style/SectionTitle"
+                android:text="状态与诊断" />
 
-        <CheckBox
-            android:id="@+id/cb_custom_ap"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="自定义热点名称和密码（进阶）" />
-
-        <LinearLayout
-            android:id="@+id/layout_custom_ap"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <EditText
-                android:id="@+id/et_ssid"
+            <TextView
+                android:id="@+id/diag"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="热点名称"
-                android:inputType="text"
-                android:maxLength="32" />
+                android:fontFamily="monospace"
+                android:textSize="12sp"
+                android:textColor="@color/text_primary"
+                android:lineSpacingMultiplier="1.35"
+                android:paddingTop="8dp"
+                android:text="正在检测…" />
 
-            <EditText
-                android:id="@+id/et_pass"
+            <View style="@style/Divider" />
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="热点密码（至少 8 位）"
-                android:inputType="textPassword"
-                android:maxLength="63" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_test_on"
+                    style="@android:style/Widget.Material.Button.Colored"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:text="测试开启" />
+
+                <Button
+                    android:id="@+id/btn_test_off"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textSize="13sp"
+                    android:text="测试关闭" />
+
+                <Button
+                    android:id="@+id/btn_recheck_root"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textSize="13sp"
+                    android:text="重测 Root" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 热点名称 / 密码 -->
+        <LinearLayout style="@style/Card">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="热点名称 / 密码" />
+
+            <TextView
+                style="@style/HintText"
+                android:text="默认使用系统里已配置的热点名称/密码（Root 直启时自动读取系统配置）。只有想覆盖系统设置时才需要开启进阶填写。" />
 
             <CheckBox
-                android:id="@+id/cb_show_pass"
-                android:layout_width="wrap_content"
+                android:id="@+id/cb_custom_ap"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="显示密码" />
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:text="自定义热点名称和密码（进阶）" />
+
+            <LinearLayout
+                android:id="@+id/layout_custom_ap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/et_ssid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="热点名称"
+                    android:inputType="text"
+                    android:maxLength="32" />
+
+                <EditText
+                    android:id="@+id/et_pass"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="热点密码（至少 8 位）"
+                    android:inputType="textPassword"
+                    android:maxLength="63" />
+
+                <CheckBox
+                    android:id="@+id/cb_show_pass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:text="显示密码" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 控制中心磁贴 -->
+        <LinearLayout style="@style/Card">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="控制中心磁贴" />
+
+            <TextView
+                style="@style/SubLabel"
+                android:text="点击" />
+
+            <RadioGroup
+                android:id="@+id/rg_tile_click"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/rb_tc_toggle"
+                    style="@style/RadioOption"
+                    android:text="切换热点（失败自动回退打开系统页面）" />
+
+                <RadioButton
+                    android:id="@+id/rb_tc_page"
+                    style="@style/RadioOption"
+                    android:text="仅打开系统热点设置页" />
+            </RadioGroup>
+
+            <View style="@style/Divider" />
+
+            <TextView
+                style="@style/SubLabel"
+                android:text="长按" />
+
+            <RadioGroup
+                android:id="@+id/rg_tile_longpress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/rb_lp_settings"
+                    style="@style/RadioOption"
+                    android:text="打开本应用设置（推荐）" />
+
+                <RadioButton
+                    android:id="@+id/rb_lp_page"
+                    style="@style/RadioOption"
+                    android:text="打开系统热点设置页" />
+
+                <RadioButton
+                    android:id="@+id/rb_lp_system"
+                    style="@style/RadioOption"
+                    android:text="系统默认（应用信息）" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- 桌面图标 -->
+        <LinearLayout style="@style/Card">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="桌面图标 · 点击行为" />
+
+            <RadioGroup
+                android:id="@+id/rg_launcher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/rb_lc_page"
+                    style="@style/RadioOption"
+                    android:text="打开系统热点设置页（推荐）" />
+
+                <RadioButton
+                    android:id="@+id/rb_lc_toggle"
+                    style="@style/RadioOption"
+                    android:text="切换热点" />
+
+                <RadioButton
+                    android:id="@+id/rb_lc_settings"
+                    style="@style/RadioOption"
+                    android:text="打开本应用设置" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- 高级 · Root 自定义命令 -->
+        <LinearLayout style="@style/Card">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="高级 · Root 自定义命令（可选）" />
+
+            <TextView
+                style="@style/HintText"
+                android:text="配置后将优先于内置 cmd wifi 策略执行（需 Root）。适用于反射被系统拦截且 cmd wifi 不可用的新系统，可填 service call 命令。" />
+
+            <EditText
+                android:id="@+id/et_custom_on"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="热点开启命令，如：service call tethering 4 null s16 com.android.shell"
+                android:inputType="text"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_custom_off"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="热点关闭命令，如：service call tethering 5 i32 0"
+                android:inputType="text"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:text="控制中心磁贴 · 点击行为"
-            android:textStyle="bold"
-            android:textSize="16sp" />
-
-        <RadioGroup
-            android:id="@+id/rg_tile_click"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioButton
-                android:id="@+id/rb_tc_toggle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="切换热点（失败自动回退打开系统页面）" />
-
-            <RadioButton
-                android:id="@+id/rb_tc_page"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="仅打开系统热点设置页" />
-        </RadioGroup>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="12dp"
-            android:text="控制中心磁贴 · 长按行为"
-            android:textStyle="bold"
-            android:textSize="16sp" />
-
-        <RadioGroup
-            android:id="@+id/rg_tile_longpress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioButton
-                android:id="@+id/rb_lp_settings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="打开本应用设置（推荐）" />
-
-            <RadioButton
-                android:id="@+id/rb_lp_page"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="打开系统热点设置页" />
-
-            <RadioButton
-                android:id="@+id/rb_lp_system"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="系统默认（应用信息）" />
-        </RadioGroup>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="12dp"
-            android:text="应用图标 · 点击行为"
-            android:textStyle="bold"
-            android:textSize="16sp" />
-
-        <RadioGroup
-            android:id="@+id/rg_launcher"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioButton
-                android:id="@+id/rb_lc_page"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="打开系统热点设置页（推荐）" />
-
-            <RadioButton
-                android:id="@+id/rb_lc_toggle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="切换热点" />
-
-            <RadioButton
-                android:id="@+id/rb_lc_settings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="打开本应用设置" />
-        </RadioGroup>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:text="高级 · Root 自定义命令（可选）"
-            android:textStyle="bold"
-            android:textSize="16sp" />
-
-        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:text="配置后将优先于内置 cmd wifi 策略执行（需 Root）。适用于反射被系统拦截且 cmd wifi 不可用的新系统，可填 service call 命令。" />
-
-        <EditText
-            android:id="@+id/et_custom_on"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="热点开启命令，如：service call tethering 4 null s16 com.android.shell"
-            android:inputType="text"
-            android:textSize="12sp" />
-
-        <EditText
-            android:id="@+id/et_custom_off"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="热点关闭命令，如：service call tethering 5 i32 0"
-            android:inputType="text"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp"
             android:textSize="11sp"
+            android:lineSpacingMultiplier="1.3"
             android:text="开关策略：① 反射真共享（≤ Android 15，无需 Root）→ ② Root 自定义命令 → ③ Root cmd wifi start/stop-softap → ④ 打开系统热点页。所有修改即时保存。"
-            android:textColor="#888888" />
+            android:textColor="@color/text_secondary" />
     </LinearLayout>
 </ScrollView>
