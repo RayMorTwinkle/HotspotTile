@@ -265,5 +265,21 @@ exported（可被任意 App 拉起肩窥）；`diag()` 明文打印密码进诊�
   `startVariant` 缓存。
 - **P3-5 附带**：`requestAddTileService` 抛异常路径同样复位
   `tilePrompted`。
-- 待真机验证：API 26 磁贴、Magisk 授权超时→授权→重检、系统 XML 实际
-  解析（不同 Android 版本 `<SoftAp>` 元素格式）、OEM dumpsys 格式。
+- 待真机验证：API 26 磁贴、OEM dumpsys 格式差异。
+
+## 真机验证（2026-09-19，TCL T508N / Android 13 / Magisk 27.0）
+
+- **发现并修复一个 spec 未覆盖的真 bug**：系统 XML 实际使用
+  WifiConfigStore **子元素格式**（`<string name="WifiSsid">…`），而非
+  草稿假设的 `<SoftAp>` 标签属性格式——解析永远失败导致默认模式不可用。
+  已改为子元素优先 + 属性格式兼容，并按 `SecurityType` 判定开放/加密
+  （加密但读不到密码 = 凭据不全，不误判开放）。提交 `a1f0451`。
+- **默认模式全链路通过**：进阶未勾选、凭据为空 → root 读系统 XML 拿到
+  `T508N-Net` + 密码 → `cmd wifi start-softap` 变体 0 →
+  `ROLE_SOFTAP_TETHERED` 确认真共享热点；再次 toggle 正常关闭。
+- **P1-2 验证**：首次 su 触发 Magisk 授权弹窗、probe 超时未写死缓存；
+  授权后 `root available=true cached=true`，凭据随之可读。
+- **FALLBACK_APP_SETTINGS 验证**：root 未授权时 toggle 正确报错并打开
+  本 App 设置页（而非伪造凭据）。
+- **P2-9 验证**：诊断页密码打码 `'****'`；「热点凭据：系统配置」显示正确。
+- **磁贴引导验证**：Android 13 的「添加到快捷设置」系统对话框正常弹出。
