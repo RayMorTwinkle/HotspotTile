@@ -16,28 +16,52 @@ import android.widget.Toast
  */
 class MainActivity : Activity() {
 
-    companion object { private const val TAG = "HotspotEngine" }
+    companion object {
+        private const val TAG = "MainActivity"
+        private const val ACTION_OPEN_PAGE = "com.ray.hotspot.action.OPEN_PAGE"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         HotspotEngine.init(applicationContext)
         requestAddTileOnce()
 
-        val mode = intent?.getStringExtra("mode") ?: Prefs.launcherClick
+        // mode extra 仅对内部 shortcut action 生效，防止任意 App 借 exported
+        // Activity 驱动反射/Root 开关路径
+        val mode = (
+            if (intent?.action == ACTION_OPEN_PAGE) intent?.getStringExtra("mode") else null
+            ) ?: Prefs.launcherClick
         when (mode) {
             "settings" -> {
                 startActivity(Intent(this, SettingsActivity::class.java))
                 finish()
             }
             "toggle" -> {
-                HotspotEngine.toggle { ok, msg ->
-                    Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
-                    if (!ok) openSystemPage()
+                // 切换要秒级到分钟级，先给即时反馈防止用户以为没点上而重复触发
+                Toast.makeText(applicationContext, "正在切换热点…", Toast.LENGTH_SHORT).show()
+                HotspotEngine.toggle { r ->
+                    Toast.makeText(applicationContext, r.msg, Toast.LENGTH_SHORT).show()
+                    if (!r.ok) when (r.fallback) {
+                        HotspotEngine.ToggleResult.FALLBACK_APP_SETTINGS ->
+                            startActivity(Intent(this, SettingsActivity::class.java))
+                        HotspotEngine.ToggleResult.FALLBACK_SYSTEM_PAGE ->
+                            if (!openSystemPage()) {
+                                Toast.makeText(
+                                    applicationContext, "无法打开系统热点设置页",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                    }
                     finish()
                 }
             }
             else -> { // "page"
-                openSystemPage()
+                if (!openSystemPage()) {
+                    Toast.makeText(
+                        applicationContext, "无法打开系统热点设置页",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
                 finish()
             }
         }
@@ -60,9 +84,18 @@ class MainActivity : Activity() {
                 getString(R.string.tile_name),
                 Icon.createWithResource(this, R.drawable.ic_hotspot),
                 mainExecutor
-            ) { }
+            ) { result ->
+                // 用户在系统对话框拒绝或添加失败 → 复位，下次启动再引导一次
+                if (result != StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED &&
+                    result != StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED
+                ) {
+                    Prefs.tilePrompted = false
+                }
+            }
+            // 调用成功发起才置位；用户在对话框拒绝由上面回调复位
             Prefs.tilePrompted = true
         } catch (t: Throwable) {
+            Prefs.tilePrompted = false
             Log.w(TAG, "requestAddTileService failed: $t")
         }
     }

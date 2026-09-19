@@ -14,7 +14,7 @@
 [![No Internet Permission](https://img.shields.io/badge/permissions-no%20INTERNET-9cf)](app/src/main/AndroidManifest.xml)
 [![License](https://img.shields.io/github/license/RayMorTwinkle/HotspotTile?color=orange)](LICENSE)
 
-*零依赖 · 无广告 · 无网络权限 · 单 Activity 双 Service 极简实现*
+*零依赖 · 无广告 · 无网络权限 · 双 Activity 单 Service 极简实现*
 
 </div>
 
@@ -42,7 +42,7 @@
 
 **设置页里可以调：**
 
-- 🏷️ 热点名称 & 密码（留空 = 跟随系统默认；仅 Root 命令直启模式使用）
+- 🏷️ 热点名称 & 密码（进阶可自定义；默认自动读取系统配置，仅 Root 命令直启模式使用）
 - 🎛️ 磁贴点击行为 / 磁贴长按行为 / 桌面图标点击行为
 - 🧪 一键「测试开启 / 测试关闭」
 - 🩺 实时诊断：系统版本、Root 可用性、热点状态、当前生效命令
@@ -50,7 +50,7 @@
 
 ## 🧠 开关策略引擎
 
-点击磁贴时，App 会沿策略链自动尝试，**谁验证成功就用谁，并把成功路径缓存下来**：
+点击磁贴时，App 会沿策略链自动尝试，**谁验证成功就用谁**（cmd wifi 语法变体序号会缓存下来加速下次切换）：
 
 ```mermaid
 flowchart TD
@@ -118,8 +118,9 @@ adb install -r app-debug.apk
 <summary><b>🏷️ 热点名称 / 密码</b>（点开）</summary>
 
 - 仅作用于 **Root 命令直启模式**（`cmd wifi start-softap` 需要显式传入 SSID 和密码）
-- **留空 = 保持系统默认**：反射路径永远使用系统里已配置的热点；命令路径留空时用「机型名 / 12345678」兜底
-- 建议正式使用前改成自己的密码
+- **默认（不开进阶）= 使用系统配置**：命令路径会 Root 读取 `WifiConfigStoreSoftAp.xml` 拿到系统里已配好的名称/密码，不需要重复填写；读不到时会明确报错并引导来设置页填写，**不会**伪造默认凭据
+- **进阶勾选「自定义热点名称和密码」** 后，命令路径改用此处填写的凭据
+- 反射路径（≤ Android 15 免 Root）永远使用系统配置，与此设置无关
 
 </details>
 

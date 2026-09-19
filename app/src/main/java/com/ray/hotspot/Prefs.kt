@@ -40,12 +40,26 @@ object Prefs {
         get() = get("tile_longpress", "settings")
         set(v) = putString("tile_longpress", v)
 
-    /** 热点名称（仅 Root cmd wifi 直启模式使用；留空=跟随系统默认） */
+    /**
+     * 进阶开关：自定义热点名称/密码。
+     * false（默认）= cmd wifi 直启时读取系统热点配置（root 读
+     * WifiConfigStoreSoftAp.xml）；读不到会报错并请用户来此开启后填写。
+     */
+    var customApConfig: Boolean
+        get() = get("custom_ap_config", false)
+        set(v) = putBoolean("custom_ap_config", v)
+
+    /** 热点名称（仅 customApConfig=true 时生效） */
     var apSsid: String
         get() = get("ap_ssid", "")
         set(v) = putString("ap_ssid", v)
 
-    /** 热点密码（留空=用内置默认 12345678，建议在设置页修改） */
+    /**
+     * 热点密码（仅 customApConfig=true 时生效）。
+     * 明文存储是有意取舍：MODE_PRIVATE + allowBackup=false + 零依赖（无
+     * EncryptedSharedPreferences）；本文件与 ap_ssid 的凭据经单引号转义后
+     * 才会进入 shell 命令。
+     */
     var apPass: String
         get() = get("ap_pass", "")
         set(v) = putString("ap_pass", v)
@@ -65,7 +79,7 @@ object Prefs {
         get() = get("tile_prompted", false)
         set(v) = putBoolean("tile_prompted", v)
 
-    /** 缓存验证成功的 cmd wifi 命令变体，加速后续切换 */
+    /** 验证成功的 cmd wifi 命令变体，加速后续切换 */
     var startVariant: Int
         get() = get("start_variant", -1)
         set(v) = putInt("start_variant", v)
@@ -73,4 +87,13 @@ object Prefs {
     var stopVariant: Int
         get() = get("stop_variant", -1)
         set(v) = putInt("stop_variant", v)
+
+    /** cmd wifi 变体整轮失败计数；达到阈值后重置缓存变体（见 HotspotEngine） */
+    var startVariantFails: Int
+        get() = get("start_variant_fails", 0)
+        set(v) = putInt("start_variant_fails", v)
+
+    var stopVariantFails: Int
+        get() = get("stop_variant_fails", 0)
+        set(v) = putInt("stop_variant_fails", v)
 }

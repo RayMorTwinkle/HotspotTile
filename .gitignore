@@ -2,6 +2,9 @@
 build/
 app/build/
 captures/
+*.apk
+.cxx/
+.kotlin/
 
 # IDE
 .idea/
@@ -10,6 +13,11 @@ local.properties
 
 # Gradle
 .gradle/
+
+# Signing（Release 构建前必须就位，防止误提交密钥）
+*.keystore
+*.jks
+keystore.properties
 
 # OS
 .DS_Store

@@ -23,7 +23,8 @@ class HotspotTileService : TileService() {
     override fun onTileAdded() = refresh()
 
     override fun onClick() {
-        if (isLocked) unlockAndRun { act() } else act()
+        // isLocked/unlockAndRun 是 API 27 方法，API 26 直接走 act()
+        if (Build.VERSION.SDK_INT >= 27 && isLocked) unlockAndRun { act() } else act()
     }
 
     private fun act() {
@@ -34,9 +35,12 @@ class HotspotTileService : TileService() {
             }
             else -> { // "toggle"
                 setBusy()
-                HotspotEngine.toggle { ok, msg ->
-                    toast(msg)
-                    if (!ok) openSystemPage()
+                HotspotEngine.toggle { r ->
+                    toast(r.msg)
+                    when (r.fallback.takeIf { !r.ok }) {
+                        HotspotEngine.ToggleResult.FALLBACK_APP_SETTINGS -> openAppSettings()
+                        HotspotEngine.ToggleResult.FALLBACK_SYSTEM_PAGE -> openSystemPage()
+                    }
                     refresh()
                 }
             }
@@ -56,6 +60,7 @@ class HotspotTileService : TileService() {
             val rooted = RootShell.available()
             main.post {
                 val t = qsTile ?: return@post
+                // API 26-28 无 subtitle 可显示，未知状态只能呈现 INACTIVE（取舍已记录）
                 t.state = if (s == true) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
                 if (Build.VERSION.SDK_INT >= 29) {
                     t.subtitle = when {
@@ -70,20 +75,28 @@ class HotspotTileService : TileService() {
         }.start()
     }
 
+    private fun collapseAndStart(intent: Intent) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (Build.VERSION.SDK_INT >= 34) {
+            startActivityAndCollapse(intent)
+        } else {
+            @Suppress("DEPRECATION")
+            startActivityAndCollapse(
+                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+            )
+        }
+    }
+
     private fun openSystemPage() {
         HotspotEngine.openHotspotSettings { intent ->
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            if (Build.VERSION.SDK_INT >= 34) {
-                startActivityAndCollapse(intent)
-            } else {
-                @Suppress("DEPRECATION")
-                startActivityAndCollapse(
-                    PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-                )
-            }
+            collapseAndStart(intent)
             true
         }
     }
+
+    /** 缺凭据等需要用户到本 App 设置页补信息时的兜底。 */
+    private fun openAppSettings() =
+        collapseAndStart(Intent(this, SettingsActivity::class.java))
 
     private fun toast(msg: String) {
         main.post { Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show() }

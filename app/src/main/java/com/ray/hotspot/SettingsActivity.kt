@@ -8,22 +8,25 @@ import android.os.Bundle
 import android.provider.Settings
 import android.service.quicksettings.TileService
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 
-/** 应用设置页：热点名称/密码、磁贴与图标行为、Root 自定义命令、诊断。 */
+/** 应用设置页：热点名称/密码（进阶）、磁贴与图标行为、Root 自定义命令、诊断。 */
 class SettingsActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         HotspotEngine.init(applicationContext)
-        setContentView(R.layout.activity_settings)
 
-        // 从控制中心磁贴长按进入：按用户配置改道
+        // 从控制中心磁贴长按进入：按用户配置改道（在 inflate 前判断，省去无用布局）
         if (intent?.action == TileService.ACTION_QS_TILE_PREFERENCES) {
             when (Prefs.tileLongPress) {
                 "page" -> {
@@ -44,9 +47,14 @@ class SettingsActivity : Activity() {
             }
         }
 
+        setContentView(R.layout.activity_settings)
+
         val diag = findViewById<TextView>(R.id.diag)
         val etSsid = findViewById<EditText>(R.id.et_ssid)
         val etPass = findViewById<EditText>(R.id.et_pass)
+        val cbCustomAp = findViewById<CheckBox>(R.id.cb_custom_ap)
+        val layoutCustomAp = findViewById<LinearLayout>(R.id.layout_custom_ap)
+        val cbShowPass = findViewById<CheckBox>(R.id.cb_show_pass)
         val etCustomOn = findViewById<EditText>(R.id.et_custom_on)
         val etCustomOff = findViewById<EditText>(R.id.et_custom_off)
         val rgTileClick = findViewById<RadioGroup>(R.id.rg_tile_click)
@@ -54,8 +62,11 @@ class SettingsActivity : Activity() {
         val rgLauncher = findViewById<RadioGroup>(R.id.rg_launcher)
         val btnOn = findViewById<Button>(R.id.btn_test_on)
         val btnOff = findViewById<Button>(R.id.btn_test_off)
+        val btnRecheckRoot = findViewById<Button>(R.id.btn_recheck_root)
 
         // ---- 载入 ----
+        cbCustomAp.isChecked = Prefs.customApConfig
+        layoutCustomAp.visibility = if (Prefs.customApConfig) View.VISIBLE else View.GONE
         etSsid.setText(Prefs.apSsid)
         etPass.setText(Prefs.apPass)
         etCustomOn.setText(Prefs.customOn)
@@ -90,6 +101,19 @@ class SettingsActivity : Activity() {
                 )
             } catch (_: Throwable) { }
         }
+        cbCustomAp.setOnCheckedChangeListener { _, checked ->
+            Prefs.customApConfig = checked
+            layoutCustomAp.visibility = if (checked) View.VISIBLE else View.GONE
+            loadDiag(diag)
+        }
+        cbShowPass.setOnCheckedChangeListener { _, checked ->
+            etPass.inputType = if (checked) {
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            } else {
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+            etPass.setSelection(etPass.text.length)
+        }
         etSsid.addTextChangedListener(simpleWatcher(etSsid) { Prefs.apSsid = it.text.toString() })
         etPass.addTextChangedListener(simpleWatcher(etPass) { Prefs.apPass = it.text.toString() })
         etCustomOn.addTextChangedListener(simpleWatcher(etCustomOn) { Prefs.customOn = it.text.toString() })
@@ -117,9 +141,13 @@ class SettingsActivity : Activity() {
         fun runTest(turnOn: Boolean, btn: Button, other: Button) {
             btn.isEnabled = false
             other.isEnabled = false
-            Toast.makeText(this, if (turnOn) "正在开启…" else "正在关闭…", Toast.LENGTH_SHORT).show()
-            val cb: (Boolean, String) -> Unit = { ok, msg ->
-                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                applicationContext,
+                if (turnOn) "正在开启…" else "正在关闭…",
+                Toast.LENGTH_SHORT
+            ).show()
+            val cb: (HotspotEngine.ToggleResult) -> Unit = { r ->
+                Toast.makeText(applicationContext, r.msg, Toast.LENGTH_SHORT).show()
                 btn.isEnabled = true
                 other.isEnabled = true
                 loadDiag(diag)
@@ -128,6 +156,12 @@ class SettingsActivity : Activity() {
         }
         btnOn.setOnClickListener { runTest(true, btnOn, btnOff) }
         btnOff.setOnClickListener { runTest(false, btnOn, btnOff) }
+
+        // 重新探测 Root（Magisk 授权弹窗曾超时导致缓存假阴性时使用）
+        btnRecheckRoot.setOnClickListener {
+            RootShell.forgetCache()
+            loadDiag(diag)
+        }
 
         loadDiag(diag)
     }

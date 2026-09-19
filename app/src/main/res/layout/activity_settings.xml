@@ -45,13 +45,20 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="测试关闭" />
+
+            <Button
+                android:id="@+id/btn_recheck_root"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="重新检测Root" />
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
-            android:text="热点名称 / 密码"
+            android:text="热点名称 / 密码（进阶）"
             android:textStyle="bold"
             android:textSize="16sp" />
 
@@ -59,23 +66,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:text="仅用于 Root 命令直启模式。反射直控与打开系统页面时始终使用系统里已配置的热点。\n留空 = 保持系统默认（命令直启时用机型名 / 12345678 兜底）。" />
+            android:text="默认使用系统里已配置的热点名称/密码（Root 直启时自动读取系统配置）。只有想覆盖系统设置时才需要开启进阶填写。" />
 
-        <EditText
-            android:id="@+id/et_ssid"
+        <CheckBox
+            android:id="@+id/cb_custom_ap"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="热点名称（留空跟随系统）"
-            android:inputType="text"
-            android:maxLength="32" />
+            android:text="自定义热点名称和密码（进阶）" />
 
-        <EditText
-            android:id="@+id/et_pass"
+        <LinearLayout
+            android:id="@+id/layout_custom_ap"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="热点密码（至少 8 位，留空用默认）"
-            android:inputType="textVisiblePassword"
-            android:maxLength="63" />
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/et_ssid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="热点名称"
+                android:inputType="text"
+                android:maxLength="32" />
+
+            <EditText
+                android:id="@+id/et_pass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="热点密码（至少 8 位）"
+                android:inputType="textPassword"
+                android:maxLength="63" />
+
+            <CheckBox
+                android:id="@+id/cb_show_pass"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="显示密码" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
