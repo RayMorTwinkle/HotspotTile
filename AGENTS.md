@@ -32,4 +32,9 @@
 
 ## 测试
 本项目无仪器化测试（UI 与系统服务强耦合），验证方式：`./gradlew assembleDebug` 编译通过 +
-按 README 手工验证（设置页「测试开启/关闭」按钮）。
+按 README 手工验证（设置页「测试开启/关闭」按钮）。发布前对照 `docs/verification-checklist.md` 过真机清单。
+
+## 发布
+- 触发：Actions → Release workflow（version 可留空自动 patch+1）；release agent 无参触发是硬契约。
+- 版本号流程：**先把 `app/build.gradle.kts` 的 `versionName`/`versionCode` 默认值 bump 到目标版本**（F-Droid 源码构建依赖入库值），再触发 workflow；CI 的 `-P` 参数按 tag 覆盖。
+- 签名：keystore 不入库，经 Secrets（RELEASE_KEYSTORE/KEYSTORE_PASSWORD/KEY_ALIAS/KEY_PASSWORD）还原；证书指纹公布于 README 安装节。

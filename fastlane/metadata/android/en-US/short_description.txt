@@ -1,0 +1,1 @@
+Restore hidden hotspot controls: launcher shortcut & QS tile toggle

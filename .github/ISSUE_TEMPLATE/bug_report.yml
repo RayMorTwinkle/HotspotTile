@@ -1,0 +1,48 @@
+name: Bug 报告
+description: 功能异常、开关失败、崩溃等
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 期望行为 vs 实际行为
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: 机型
+      placeholder: 如 TCL T508N
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android 版本
+      placeholder: 如 Android 13（API 33）
+    validations:
+      required: true
+  - type: dropdown
+    id: root
+    attributes:
+      label: Root 情况
+      options:
+        - 有 Root（Magisk）
+        - 无 Root
+        - 不确定
+    validations:
+      required: true
+  - type: textarea
+    id: diag
+    attributes:
+      label: 诊断页输出
+      description: 打开 App 设置页，复制「状态与诊断」区的全部文本粘贴到这里
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充
+      description: 复现步骤、截图、logcat 片段等（可选）

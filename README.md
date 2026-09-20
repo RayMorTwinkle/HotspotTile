@@ -1,6 +1,8 @@
 <div align="center">
 
-# 📶 HotspotTile
+<img src="docs/images/icon.png" width="120" alt="HotspotTile" />
+
+# HotspotTile
 
 ### 把被平板厂商藏起来的「WiFi 热点 / WLAN 共享」开关，还给你。
 
@@ -98,7 +100,26 @@ flowchart TD
 到 [**Releases**](https://github.com/RayMorTwinkle/HotspotTile/releases) 下载 `HotspotTile-x.y.z.apk`（正式 release 签名构建），直接安装。
 
 <details>
-<summary>🛠️ 用 adb 安装</summary>
+<summary>� 校验 APK 真伪（可选）</summary>
+
+v1.0.4 起所有 release 产物用同一把 release key 签名，证书 SHA-256 指纹：
+
+```
+c79d553ca63b7f60964cd3f997b10f4aa7a594e4041932475fa47fb9596fe3d4
+```
+
+验证方式（任选其一）：
+
+```bash
+apksigner verify --print-certs HotspotTile-*.apk   # 比对 SHA-256 digest
+```
+
+或用 [AppVerifier](https://github.com/soupslurpr/AppVerifier) 扫码/贴指纹核对。
+签名不匹配的安装包会被 Android 直接拒绝覆盖安装。
+</details>
+
+<details>
+<summary>�🛠️ 用 adb 安装</summary>
 
 ```bash
 adb install -r HotspotTile-*.apk

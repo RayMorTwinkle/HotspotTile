@@ -14,9 +14,11 @@ android {
         // 升高会失去 WifiManager.getWifiApState 等反射可用性；(b) 避开
         // Android 15 强制 edge-to-edge 对 Theme.DeviceDefault.Settings 的破坏
         targetSdk = 34
-        // CI 经 -PversionName/-PversionCode 注入 tag 对应版本；本地构建用默认值
-        versionCode = providers.gradleProperty("versionCode").orNull?.toInt() ?: 1
-        versionName = providers.gradleProperty("versionName").orNull ?: "1.0.0"
+        // 默认值与最新 release 保持一致（F-Droid 从源码构建拿不到 CI 注入的
+        // 版本号）；发版流程 = 先 bump 此处再触发 Release workflow（CI 的 -P 参数
+        // 仍可按 tag 覆盖，两条路不冲突）
+        versionCode = providers.gradleProperty("versionCode").orNull?.toInt() ?: 10005
+        versionName = providers.gradleProperty("versionName").orNull ?: "1.0.5"
     }
 
     signingConfigs {

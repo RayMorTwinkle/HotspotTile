@@ -31,7 +31,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: 检出代码（完整历史，含 tags）
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -63,13 +63,13 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: 安装 JDK 17（Gradle 9.x / AGP 9.x 最低要求）
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
 
       - name: 配置 Gradle（依赖缓存 + wrapper 完整性校验）
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           validate-wrappers: true
 
@@ -79,7 +79,10 @@ jobs:
       - name: 从 Secrets 还原 release keystore
         env:
           RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
-        run: echo "$RELEASE_KEYSTORE" | base64 -d > "$RUNNER_TEMP/release.jks"
+        run: |
+          echo "$RELEASE_KEYSTORE" | base64 -d > "$RUNNER_TEMP/release.jks"
+          # secret 误配会静默产出空文件、错误延迟到签名阶段才爆——此处即失败
+          [[ -s "$RUNNER_TEMP/release.jks" ]] || { echo "::error::keystore 还原为空，检查 RELEASE_KEYSTORE secret"; exit 1; }
 
       - name: 构建 release APK（签名 + 注入版本号）
         env:
@@ -111,7 +114,7 @@ jobs:
           echo "APK 大小：$(du -h "$APK" | cut -f1)"
 
       - name: 打 tag 并创建 GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.ver.outputs.version }}
           target_commitish: ${{ github.sha }}

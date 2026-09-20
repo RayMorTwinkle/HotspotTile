@@ -1,0 +1,49 @@
+name: 机型兼容性报告
+description: 反馈某机型/Android 版本上的可用性（成功或失败都算）
+labels: ["device-compat"]
+body:
+  - type: input
+    id: device
+    attributes:
+      label: 机型
+      placeholder: 如 TCL T508N / 联想小新 Pad
+    validations:
+      required: true
+  - type: input
+    id: rom
+    attributes:
+      label: ROM / 系统
+      placeholder: 如 原厂固件 / MIUI 14 / ZUI 15
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android 版本
+      placeholder: 如 Android 13（API 33）
+    validations:
+      required: true
+  - type: dropdown
+    id: root
+    attributes:
+      label: Root 情况
+      options:
+        - 有 Root（Magisk）
+        - 无 Root
+    validations:
+      required: true
+  - type: checkboxes
+    id: results
+    attributes:
+      label: 实测结果
+      options:
+        - label: 磁贴可以开关热点
+        - label: 桌面图标可用
+        - label: 默认模式读到系统热点名/密码
+        - label: 进阶自定义名称密码生效
+        - label: 开关后状态显示正确
+  - type: textarea
+    id: notes
+    attributes:
+      label: 备注
+      description: 走了哪条路径、失败时的现象、诊断页输出等

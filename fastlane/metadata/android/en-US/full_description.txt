@@ -1,0 +1,12 @@
+Many Android tablets (and some phones) hide the Wi-Fi hotspot toggle deep inside Settings. This app does one thing: puts the hotspot switch back at your fingertips.
+
+Features:
+• Launcher icon jumps straight to system hotspot settings (configurable: toggle / app settings)
+• Quick Settings tile toggles the hotspot: reflection-based direct control on Android ≤15 without root; cmd wifi start/stop-softap on rooted devices
+• Uses the system-configured SSID/password by default (read from system config under root); advanced mode allows custom credentials
+• If credentials can't be obtained it reports the error and opens settings — never fakes them
+
+Highlights:
+• Zero third-party dependencies, no ads, no INTERNET permission, ~0.9MB APK
+• Every toggle is verified by polling real state — invocation success is never trusted
+• Release builds use a consistent signature for in-place upgrades

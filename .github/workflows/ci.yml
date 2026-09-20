@@ -1,0 +1,44 @@
+# 提交/PR 门禁：编译 + lint（报告作 artifact，不挡合并——abortOnError=false 是有意为之）
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: 安装 JDK 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: 配置 Gradle（依赖缓存 + wrapper 完整性校验）
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          validate-wrappers: true
+
+      - name: 预接受 Android SDK 许可
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: 编译（assembleDebug）
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+
+      - name: lint（生成报告，不阻断）
+        run: ./gradlew lint --continue || true
+
+      - name: 上传 lint 报告
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lint-report
+          path: app/build/reports/
+          if-no-files-found: ignore
